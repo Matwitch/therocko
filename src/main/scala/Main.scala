@@ -43,8 +43,7 @@ object Bag:
 
 @main def hello: Unit = 
   { 
-    val t = Seq[Int]();
-    println(Bag(t*))
+    
   }
  
   
