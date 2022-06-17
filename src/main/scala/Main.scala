@@ -1,6 +1,4 @@
 package nazva
-import java.{util => ju}
-
 
 
 case class Bag[A] private[Bag] (val map: Map[A, Int]):
