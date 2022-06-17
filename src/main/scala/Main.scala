@@ -7,43 +7,26 @@ case class Bag[A] private[Bag] (val map: Map[A, Int]):
     this.map.toString();
   } 
 
+  def size(): Int = 
+    this.map.foldLeft(0)(_+_._2)
 
 object Bag:
-  private def run[A](result: Map[A, Int], xs: Seq[A]): Map[A, Int] = 
-          var temp: Map[A, Int] = result;
-          xs match
-            case Seq(a, b*) => 
-                val t: Option[Int] = result.get(a);
-                t match
-                  case None => 
-                    temp += (a -> 1);
-                  case _ =>
-                    temp -= a;
-                    temp += (a -> (t.get + 1));
-                    
-                run(temp, b);
-            case _ => result;
+  
+  def apply[A](xs: A*): Bag[A] =
+    Bag[A](Seq(xs*).groupBy(identity).mapValues(_.size).toMap);
 
-  def apply[A](xs: A*): Bag[A] = 
-      val m : Map[A, Int] = run(Map.empty[A, Int], xs);
-      Bag[A](m);
-
-
-  def add[A](b: Bag[A], as: A*): Bag[A] =
-    val m : Map[A, Int] = run(b.map, as);
-    Bag[A](m);
+  def add[A](b: Bag[A], xs: A*): Bag[A] =
+    val temp_m = Seq(xs*).groupBy(identity).mapValues(_.size).toMap;
+    val mergedList  = (b.map.toList) ++ (temp_m.toList); 
+    Bag[A](mergedList.groupBy(_._1).map{case (k,v) => k -> v.map(_._2).sum});
 
   def remove[A](b: Bag[A], as: A): Bag[A] =
-    var temp = b.map
-    val t: Option[Int] = temp.get(as);
-    t match
-      case None => b;
-      case _ =>
-        temp -= as;
-        if t.get > 1 then
-          temp += (as -> (t.get - 1));
+    val mergedList = (b.map.toList) ++ (Map(as -> -1).toList); 
+    val mx = mergedList.groupBy(_._1).map{case (k,v) => k -> v.map(_._2).sum};
 
-        Bag[A](temp);
+    mx(as) match 
+      case 0 => Bag(mx - as)
+      case _ => Bag(mx)
 
   def toSet[A](b: Bag[A]): Set[A] =
     b.map.keySet;
@@ -59,16 +42,9 @@ object Bag:
 
 
 @main def hello: Unit = 
-  var t = Bag('a', 'a', 'b', 'c', 'c', 'c', '2')
-  println(Bag.toSet(t));
-  println(Bag.toList(t));
-  println(t);
-  t = Bag.add(t, 'f');
-  println(t);
-  t = Bag.remove(t, 'f');
-  println(t);
-  val d = Bag();
-  println(d);
-
-  println(List(1,4,3,10,0).sorted)
+  { 
+    val t = Seq[Int]();
+    println(Bag(t*))
+  }
  
+  

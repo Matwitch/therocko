@@ -36,4 +36,26 @@ class IntegerSuite extends ScalaCheckSuite {
       Bag.toList(Bag(s.toSeq*)).sorted == s.sorted
     }
   }
+
+  property("Correct toList conversion") {
+    forAll { (s: List[Int]) =>
+      Bag.toList(Bag(s.toSeq*)).sorted == s.sorted
+    }
+  }
+
+  property("Correct removing") {
+    forAll { (s: Bag[Int]) =>
+      var t = s;
+      for( a <- 1 to s.size()){
+        t = Bag.remove(t, t.map.keySet.head);
+      }
+      t == Bag();
+    }
+  }
+
+  property("Correct size") {
+    forAll { (s: Seq[Int]) =>
+      Bag(s*).size() == s.size 
+    }
+  }
 }
